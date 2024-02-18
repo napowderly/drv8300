@@ -1,0 +1,2 @@
+module Drv8300:
+    signal gnd
