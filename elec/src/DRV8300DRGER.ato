@@ -1,3 +1,6 @@
+import Power from "generics/interfaces.ato"
+import Pair from "generics/interfaces.ato"
+
 component DRV8300DRGER:
     footprint = "VQFN-24_L4.0-W4.0-P0.50-TL-EP2.5"
     lcsc_id = "C3655801"
@@ -72,6 +75,9 @@ component DRV8300DRGER:
     gnd ~ mode.gnd
 
     # Bootstrap and sense
+    boostrap_a = new Pair
+    boostrap_b = new Pair
+    boostrap_c = new Pair
     boostrap_a.io ~ pin 20
     boostrap_b.io ~ pin 17
     boostrap_c.io ~ pin 14
@@ -80,5 +86,6 @@ component DRV8300DRGER:
     gnd ~ boostrap_c.gnd
 
     # Deadtime
+    deadtime = new Pair
     deadtime.io ~ pin 2
     gnd ~ deadtime.gnd

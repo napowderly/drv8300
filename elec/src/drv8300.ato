@@ -1,10 +1,13 @@
 import Power from "generics/interfaces.ato"
+import DiffPair from "generics/interfaces.ato"
 import Pair from "generics/interfaces.ato"
 import Resistor from "generics/resistors.ato"
 import Capacitor from "generics/capacitors.ato"
 import DRV8300DRGER from "DRV8300DRGER.ato"
+import HalfBridge from "generics/mosfets.ato"
 
-module DRV8300PowerStage:
+
+module DRV8300:
     # External interfaces
     power_batt = new Power
     power_gate = new Power
@@ -17,10 +20,11 @@ module DRV8300PowerStage:
     phase_c = new Phase
 
     # Components
-    ic = new _DRV8300DRGER
-    reference = new VoltageReference
-    bypass_1 = new Capacitor
-    bypass_2 = new Capacitor
+    ic = new DRV8300DRGER
+    bypass_cap = new _BypassCap
+    boostrap_a = new _BypassCap
+    boostrap_b = new _BypassCap
+    boostrap_c = new _BypassCap
 
     # Connections
     # Power connections
@@ -33,44 +37,43 @@ module DRV8300PowerStage:
     # Phase connections (3pwm)
     phase_a.control ~ ic.input_low_a
     phase_a.control ~ ic.input_high_a
-    phase_a.gate_low ~ ic.gate_low_a
-    phase_a.gate_high ~ ic.gate_high_a
+    phase_a.gate_low ~ ic.output_low_a
+    phase_a.gate_high ~ ic.output_high_a
 
     phase_b.control ~ ic.input_low_b
     phase_b.control ~ ic.input_high_b
-    phase_b.gate_low ~ ic.gate_low_b
-    phase_b.gate_high ~ ic.gate_high_b
+    phase_b.gate_low ~ ic.output_low_b
+    phase_b.gate_high ~ ic.output_high_b
 
     phase_c.control ~ ic.input_low_c
     phase_c.control ~ ic.input_high_c
-    phase_c.gate_low ~ ic.gate_low_c
-    phase_c.gate_high ~ ic.gate_high_c
+    phase_c.gate_low ~ ic.output_low_c
+    phase_c.gate_high ~ ic.output_high_c
 
-    # Internal
+    phase_a.output ~ ic.output_sense_a
+    phase_b.output ~ ic.output_sense_b
+    phase_c.output ~ ic.output_sense_c
 
-    # Boostrap caps
-    boostrap_a = new Capacitor
-    boostrap_b = new Capacitor
-    boostrap_c = new Capacitor
 
-    phase_a.output_sense_a.io ~ boostrap_a.1
-    phase_a.boostrap_a.io ~ boostrap_a.2
+    phase_a.output.io ~ boostrap_a.1
+    ic.boostrap_a.io ~ boostrap_a.2
 
-    phase_b.output_sense_a.io ~ boostrap_b.1
-    phase_b.boostrap_a.io ~ boostrap_b.2
+    phase_b.output.io ~ boostrap_b.1
+    ic.boostrap_a.io ~ boostrap_b.2
 
-    phase_c.output_sense_a.io ~ boostrap_c.1
-    phase_c.boostrap_a.io ~ boostrap_c.2
+    phase_c.output.io ~ boostrap_c.1
+    ic.boostrap_a.io ~ boostrap_c.2
 
     # Set mode: 3PWM: MODE = 0, 6PWM: MODE = GVDD
-    ic.MODE ~ power_gate.vcc
+    ic.mode.io ~ power_gate.vcc
+    ic.mode.gnd ~ power_gate.gnd
 
     # deadtime config
-    r_dead_time = new Resistor
-    r_dead_time.package = "0402"
-    r_dead_time.value = 40.2kohm +/- 10%
-    r_dead_time.1 ~ ic.DT
-    r_dead_time.2 ~ power_gate.gnd
+    r_deadtime = new Resistor
+    r_deadtime.package = "0402"
+    r_deadtime.value = 40.2kohm +/- 10%
+    r_deadtime.1 ~ ic.deadtime.io
+    r_deadtime.2 ~ power_gate.gnd
 
 
 module Phase:
@@ -82,31 +85,44 @@ module Phase:
     gate_high = new Pair
     gate_low = new Pair
 
-
     # Components
     half_bridge = new HalfBridge
-    r_gate_high = new Resistor
-    r_gate_low = new Resistor
+    r_gate_high = new _GateResistor
+    r_gate_low = new _GateResistor
+
+    half_bridge.nfet_high.mpn = "DPN"
+    half_bridge.nfet_high.footprint = "DNP"
+    half_bridge.nfet_low.mpn = "DPN"
+    half_bridge.nfet_low.footprint = "DNP"
+
+    # Configure components
+    r_gate_high.package = "0402"
+    r_gate_high.value = 10ohm +/- 10%
+    r_gate_low.package = "0402"
+    r_gate_low.value = 10ohm +/- 10%
+
+    # Gate resistors
+    gate_high.io ~ r_gate_high.1;
+    half_bridge.gate_high.io ~ r_gate_high.2
+
+    gate_low.io ~ r_gate_low.1;
+    half_bridge.gate_low.io ~ r_gate_low.1
 
     # Power connections
-    power_batt ~ half_bridge.power_batt
+    power_batt ~ half_bridge.power
 
-    # Signal connections
-    # current_sense.shunt_input ~ half_bridge.shunt_output
-    # half_bridge.fet_high ~ output.high
-    # half_bridge.fet_low ~ output.low
-
-module HalfBridge:
-    power_batt = new Power
-    # optional shunt resistor, if you feel so inclined
-    shunt = new Resistor
+    # Control connections
+    gate_high ~ half_bridge.gate_high
+    gate_low ~ half_bridge.gate_low
 
 
+module _BypassCap from Capacitor:
+    package = "0402"
+    value = 1uF +/- 10%
 
-
-
-
-
+module _GateResistor from Resistor:
+    package = "0402"
+    value = 10ohm +/- 10%
 
 
 

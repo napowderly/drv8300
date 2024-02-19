@@ -4,3 +4,6 @@ builds:
     entry: elec/src/drv8300.ato:DRV8300
 dependencies:
 - generics
+
+services:
+  components: https://atopile-component-server-atsuhzfd5a-uc.a.run.app/jlc
