@@ -1,2 +1,117 @@
-module Drv8300:
-    signal gnd
+import Power from "generics/interfaces.ato"
+import Pair from "generics/interfaces.ato"
+import Resistor from "generics/resistors.ato"
+import Capacitor from "generics/capacitors.ato"
+import DRV8300DRGER from "DRV8300DRGER.ato"
+
+module DRV8300PowerStage:
+    # External interfaces
+    power_batt = new Power
+    power_gate = new Power
+    power_vref = new Power
+    enable = new Pair
+
+    # Phases
+    phase_a = new Phase
+    phase_b = new Phase
+    phase_c = new Phase
+
+    # Components
+    ic = new _DRV8300DRGER
+    reference = new VoltageReference
+    bypass_1 = new Capacitor
+    bypass_2 = new Capacitor
+
+    # Connections
+    # Power connections
+    power_batt ~ phase_a.power_batt
+    power_batt ~ phase_b.power_batt
+    power_batt ~ phase_c.power_batt
+
+    power_gate ~ ic.power_gate
+
+    # Phase connections (3pwm)
+    phase_a.control ~ ic.input_low_a
+    phase_a.control ~ ic.input_high_a
+    phase_a.gate_low ~ ic.gate_low_a
+    phase_a.gate_high ~ ic.gate_high_a
+
+    phase_b.control ~ ic.input_low_b
+    phase_b.control ~ ic.input_high_b
+    phase_b.gate_low ~ ic.gate_low_b
+    phase_b.gate_high ~ ic.gate_high_b
+
+    phase_c.control ~ ic.input_low_c
+    phase_c.control ~ ic.input_high_c
+    phase_c.gate_low ~ ic.gate_low_c
+    phase_c.gate_high ~ ic.gate_high_c
+
+    # Internal
+
+    # Boostrap caps
+    boostrap_a = new Capacitor
+    boostrap_b = new Capacitor
+    boostrap_c = new Capacitor
+
+    phase_a.output_sense_a.io ~ boostrap_a.1
+    phase_a.boostrap_a.io ~ boostrap_a.2
+
+    phase_b.output_sense_a.io ~ boostrap_b.1
+    phase_b.boostrap_a.io ~ boostrap_b.2
+
+    phase_c.output_sense_a.io ~ boostrap_c.1
+    phase_c.boostrap_a.io ~ boostrap_c.2
+
+    # Set mode: 3PWM: MODE = 0, 6PWM: MODE = GVDD
+    ic.MODE ~ power_gate.vcc
+
+    # deadtime config
+    r_dead_time = new Resistor
+    r_dead_time.package = "0402"
+    r_dead_time.value = 40.2kohm +/- 10%
+    r_dead_time.1 ~ ic.DT
+    r_dead_time.2 ~ power_gate.gnd
+
+
+module Phase:
+    power_batt = new Power
+    power3v3 = new Power
+    power_vref = new Power
+    control = new Pair
+    output = new Pair
+    gate_high = new Pair
+    gate_low = new Pair
+
+
+    # Components
+    half_bridge = new HalfBridge
+    r_gate_high = new Resistor
+    r_gate_low = new Resistor
+
+    # Power connections
+    power_batt ~ half_bridge.power_batt
+
+    # Signal connections
+    # current_sense.shunt_input ~ half_bridge.shunt_output
+    # half_bridge.fet_high ~ output.high
+    # half_bridge.fet_low ~ output.low
+
+module HalfBridge:
+    power_batt = new Power
+    # optional shunt resistor, if you feel so inclined
+    shunt = new Resistor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

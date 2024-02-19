@@ -1,6 +1,6 @@
 ato-version: ^0.2.0
 builds:
   default:
-    entry: elec/src/drv8300.ato:Drv8300
+    entry: elec/src/drv8300.ato:DRV8300
 dependencies:
 - generics
