@@ -22,9 +22,9 @@ module DRV8300:
     # Components
     ic = new DRV8300DRGER
     bypass_cap = new _BypassCap
-    boostrap_a = new _BypassCap
-    boostrap_b = new _BypassCap
-    boostrap_c = new _BypassCap
+    bootstrap_a = new _BypassCap
+    bootstrap_b = new _BypassCap
+    bootstrap_c = new _BypassCap
 
     # Connections
     # Power connections
@@ -55,14 +55,14 @@ module DRV8300:
     phase_c.output ~ ic.output_sense_c
 
 
-    phase_a.output.io ~ boostrap_a.1
-    ic.boostrap_a.io ~ boostrap_a.2
+    phase_a.output.io ~ bootstrap_a.1
+    ic.bootstrap_a.io ~ bootstrap_a.2
 
-    phase_b.output.io ~ boostrap_b.1
-    ic.boostrap_a.io ~ boostrap_b.2
+    phase_b.output.io ~ bootstrap_b.1
+    ic.bootstrap_a.io ~ bootstrap_b.2
 
-    phase_c.output.io ~ boostrap_c.1
-    ic.boostrap_a.io ~ boostrap_c.2
+    phase_c.output.io ~ bootstrap_c.1
+    ic.bootstrap_a.io ~ bootstrap_c.2
 
     # Set mode: 3PWM: MODE = 0, 6PWM: MODE = GVDD
     ic.mode.io ~ power_gate.vcc
@@ -117,8 +117,8 @@ module Phase:
 
 
 module _BypassCap from Capacitor:
-    package = "0402"
-    value = 1uF +/- 10%
+    package = "0805"
+    value = 1uF +/- 20%
 
 module _GateResistor from Resistor:
     package = "0402"
