@@ -15,50 +15,18 @@ module DRV8300:
     input_high_b = new Pair
     input_high_c = new Pair
 
-    # Components
-    ic = new DRV8300DRGER
-    bypass_cap = new _BypassCap
-    bootstrap_a = new _BypassCap
-    bootstrap_b = new _BypassCap
-    bootstrap_c = new _BypassCap
+    # Gate driver outputs
+    output_low_a = new Pair
+    output_low_b = new Pair
+    output_low_c = new Pair
+    output_high_a = new Pair
+    output_high_b = new Pair
+    output_high_c = new Pair
 
-    # Connections
-    # Power connections
-    power_batt ~ phase_a.power_batt
-    power_batt ~ phase_b.power_batt
-    power_batt ~ phase_c.power_batt
-
-    power_gate ~ ic.power_gate
-
-    # Phase connections (3pwm)
-    phase_a.control ~ ic.input_low_a
-    phase_a.control ~ ic.input_high_a
-    phase_a.gate_low ~ ic.output_low_a
-    phase_a.gate_high ~ ic.output_high_a
-
-    phase_b.control ~ ic.input_low_b
-    phase_b.control ~ ic.input_high_b
-    phase_b.gate_low ~ ic.output_low_b
-    phase_b.gate_high ~ ic.output_high_b
-
-    phase_c.control ~ ic.input_low_c
-    phase_c.control ~ ic.input_high_c
-    phase_c.gate_low ~ ic.output_low_c
-    phase_c.gate_high ~ ic.output_high_c
-
-    phase_a.output ~ ic.output_sense_a
-    phase_b.output ~ ic.output_sense_b
-    phase_c.output ~ ic.output_sense_c
-
-
-    phase_a.output.io ~ bootstrap_a.1
-    ic.bootstrap_a.io ~ bootstrap_a.2
-
-    phase_b.output.io ~ bootstrap_b.1
-    ic.bootstrap_a.io ~ bootstrap_b.2
-
-    phase_c.output.io ~ bootstrap_c.1
-    ic.bootstrap_a.io ~ bootstrap_c.2
+    # Phase sense inputs
+    output_sense_a = new Pair
+    output_sense_b = new Pair
+    output_sense_c = new Pair
 
     # Set mode: 3PWM: MODE = 0, 6PWM: MODE = GVDD
     mode = new Pair
@@ -67,20 +35,20 @@ module DRV8300:
     # Components
     ic = new _DRV8300DRGER
     bypass_cap = new _BypassCap
-    c_boostrap_a = new _BypassCap
-    c_boostrap_b = new _BypassCap
-    c_boostrap_c = new _BypassCap
+    c_bootstrap_a = new _BypassCap
+    c_bootstrap_b = new _BypassCap
+    c_bootstrap_c = new _BypassCap
     r_deadtime = new Resistor
 
     # Boot strap cap connections
-    ic.boostrap_a.io ~ c_boostrap_a.1
-    ic.output_sense_a.io ~ c_boostrap_a.2
+    ic.bootstrap_a.io ~ c_bootstrap_a.1
+    ic.output_sense_a.io ~ c_bootstrap_a.2
 
-    ic.boostrap_b.io ~ c_boostrap_b.1
-    ic.output_sense_b.io ~ c_boostrap_b.2
+    ic.bootstrap_b.io ~ c_bootstrap_b.1
+    ic.output_sense_b.io ~ c_bootstrap_b.2
 
-    ic.boostrap_c.io ~ c_boostrap_c.1
-    ic.output_sense_c.io ~ c_boostrap_c.2
+    ic.bootstrap_c.io ~ c_bootstrap_c.1
+    ic.output_sense_c.io ~ c_bootstrap_c.2
 
     # deadtime config and connections
     r_deadtime.package = "0402"
@@ -114,8 +82,8 @@ module DRV8300:
     mode ~ ic.mode
 
 module _BypassCap from Capacitor:
-    package = "0805"
-    value = 1uF +/- 20%
+    package = "0402"
+    value = 1uF +/- 10%
 
 module _GateResistor from Resistor:
     package = "0402"
@@ -195,15 +163,15 @@ component _DRV8300DRGER:
     gnd ~ mode.gnd
 
     # Bootstrap and sense
-    boostrap_a = new Pair
-    boostrap_b = new Pair
-    boostrap_c = new Pair
-    boostrap_a.io ~ pin 20
-    boostrap_b.io ~ pin 17
-    boostrap_c.io ~ pin 14
-    gnd ~ boostrap_a.gnd
-    gnd ~ boostrap_b.gnd
-    gnd ~ boostrap_c.gnd
+    bootstrap_a = new Pair
+    bootstrap_b = new Pair
+    bootstrap_c = new Pair
+    bootstrap_a.io ~ pin 20
+    bootstrap_b.io ~ pin 17
+    bootstrap_c.io ~ pin 14
+    gnd ~ bootstrap_a.gnd
+    gnd ~ bootstrap_b.gnd
+    gnd ~ bootstrap_c.gnd
 
     # Deadtime
     deadtime = new Pair
