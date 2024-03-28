@@ -35,20 +35,24 @@ module DRV8300:
     # Components
     ic = new _DRV8300DRGER
     bypass_cap = new _BypassCap
-    c_boostrap_a = new _BypassCap
-    c_boostrap_b = new _BypassCap
-    c_boostrap_c = new _BypassCap
+    c_bootstrap_a = new _BypassCap
+    c_bootstrap_b = new _BypassCap
+    c_bootstrap_c = new _BypassCap
     r_deadtime = new Resistor
 
+    # Power connections
+    power_gate ~ ic.power_gate
+    power_gate ~ bypass_cap.power
+
     # Boot strap cap connections
-    ic.boostrap_a.io ~ c_boostrap_a.1
-    ic.output_sense_a.io ~ c_boostrap_a.2
+    ic.bootstrap_a.io ~ c_bootstrap_a.1
+    ic.output_sense_a.io ~ c_bootstrap_a.2
 
-    ic.boostrap_b.io ~ c_boostrap_b.1
-    ic.output_sense_b.io ~ c_boostrap_b.2
+    ic.bootstrap_b.io ~ c_bootstrap_b.1
+    ic.output_sense_b.io ~ c_bootstrap_b.2
 
-    ic.boostrap_c.io ~ c_boostrap_c.1
-    ic.output_sense_c.io ~ c_boostrap_c.2
+    ic.bootstrap_c.io ~ c_bootstrap_c.1
+    ic.output_sense_c.io ~ c_bootstrap_c.2
 
     # deadtime config and connections
     r_deadtime.package = "0402"
@@ -82,8 +86,8 @@ module DRV8300:
     mode ~ ic.mode
 
 module _BypassCap from Capacitor:
-    package = "0402"
-    value = 1uF +/- 10%
+    package = "0603"
+    value = 1uF +/- 20%
 
 module _GateResistor from Resistor:
     package = "0402"
@@ -163,15 +167,15 @@ component _DRV8300DRGER:
     gnd ~ mode.gnd
 
     # Bootstrap and sense
-    boostrap_a = new Pair
-    boostrap_b = new Pair
-    boostrap_c = new Pair
-    boostrap_a.io ~ pin 20
-    boostrap_b.io ~ pin 17
-    boostrap_c.io ~ pin 14
-    gnd ~ boostrap_a.gnd
-    gnd ~ boostrap_b.gnd
-    gnd ~ boostrap_c.gnd
+    bootstrap_a = new Pair
+    bootstrap_b = new Pair
+    bootstrap_c = new Pair
+    bootstrap_a.io ~ pin 20
+    bootstrap_b.io ~ pin 17
+    bootstrap_c.io ~ pin 14
+    gnd ~ bootstrap_a.gnd
+    gnd ~ bootstrap_b.gnd
+    gnd ~ bootstrap_c.gnd
 
     # Deadtime
     deadtime = new Pair

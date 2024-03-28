@@ -75,15 +75,15 @@ component DRV8300DRGER:
     gnd ~ mode.gnd
 
     # Bootstrap and sense
-    boostrap_a = new Pair
-    boostrap_b = new Pair
-    boostrap_c = new Pair
-    boostrap_a.io ~ pin 20
-    boostrap_b.io ~ pin 17
-    boostrap_c.io ~ pin 14
-    gnd ~ boostrap_a.gnd
-    gnd ~ boostrap_b.gnd
-    gnd ~ boostrap_c.gnd
+    bootstrap_a = new Pair
+    bootstrap_b = new Pair
+    bootstrap_c = new Pair
+    bootstrap_a.io ~ pin 20
+    bootstrap_b.io ~ pin 17
+    bootstrap_c.io ~ pin 14
+    gnd ~ bootstrap_a.gnd
+    gnd ~ bootstrap_b.gnd
+    gnd ~ bootstrap_c.gnd
 
     # Deadtime
     deadtime = new Pair
