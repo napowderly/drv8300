@@ -40,6 +40,10 @@ module DRV8300:
     c_bootstrap_c = new _BypassCap
     r_deadtime = new Resistor
 
+    # Power connections
+    power_gate ~ ic.power_gate
+    power_gate ~ bypass_cap.power
+
     # Boot strap cap connections
     ic.bootstrap_a.io ~ c_bootstrap_a.1
     ic.output_sense_a.io ~ c_bootstrap_a.2
@@ -82,8 +86,8 @@ module DRV8300:
     mode ~ ic.mode
 
 module _BypassCap from Capacitor:
-    package = "0402"
-    value = 1uF +/- 10%
+    package = "0603"
+    value = 1uF +/- 20%
 
 module _GateResistor from Resistor:
     package = "0402"
